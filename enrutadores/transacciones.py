@@ -1,51 +1,71 @@
-from fastapi import APIRouter
-from modelos.transacciones import Transaccion
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+
+from modelos.transacciones import Transaccion, TransaccionCreate
+from database.conexion import get_session
 
 router = APIRouter()
 
-transacciones = []
 
 @router.get("/transacciones")
-def listar_transacciones():
-    return transacciones
+def listar_transacciones(session: Session = Depends(get_session)):
+    return session.exec(select(Transaccion)).all()
 
 
 @router.post("/transacciones")
-def crear_transaccion(transaccion: Transaccion):
+def crear_transaccion(
+    transaccion: TransaccionCreate,
+    session: Session = Depends(get_session)
+):
+    nueva_transaccion = Transaccion.model_validate(transaccion)
 
-    transacciones.append(transaccion)
+    session.add(nueva_transaccion)
+    session.commit()
+    session.refresh(nueva_transaccion)
 
-    return {
-        "mensaje": "Transacción agregada",
-        "datos": transaccion
-    }
+    return nueva_transaccion
+
+
+@router.get("/transacciones/{id}")
+def buscar_transaccion(id: int, session: Session = Depends(get_session)):
+    transaccion = session.get(Transaccion, id)
+
+    if not transaccion:
+        raise HTTPException(status_code=404, detail="Transacción no encontrada")
+
+    return transaccion
 
 
 @router.put("/transacciones/{id}")
-def actualizar_transaccion(id: int, transaccion: Transaccion):
+def actualizar_transaccion(
+    id: int,
+    datos: TransaccionCreate,
+    session: Session = Depends(get_session)
+):
+    transaccion = session.get(Transaccion, id)
 
-    for i in range(len(transacciones)):
-        if transacciones[i].id == id:
-            transacciones[i] = transaccion
+    if not transaccion:
+        raise HTTPException(status_code=404, detail="Transacción no encontrada")
 
-            return {
-                "mensaje": "Transacción actualizada",
-                "datos": transaccion
-            }
+    transaccion.vr_unitario = datos.vr_unitario
+    transaccion.cantidad = datos.cantidad
+    transaccion.factura_id = datos.factura_id
 
-    return {"mensaje": "Transacción no encontrada"}
+    session.add(transaccion)
+    session.commit()
+    session.refresh(transaccion)
+
+    return transaccion
 
 
 @router.delete("/transacciones/{id}")
-def eliminar_transaccion(id: int):
+def eliminar_transaccion(id: int, session: Session = Depends(get_session)):
+    transaccion = session.get(Transaccion, id)
 
-    for i in range(len(transacciones)):
-        if transacciones[i].id == id:
-            eliminada = transacciones.pop(i)
+    if not transaccion:
+        raise HTTPException(status_code=404, detail="Transacción no encontrada")
 
-            return {
-                "mensaje": "Transacción eliminada",
-                "datos": eliminada
-            }
+    session.delete(transaccion)
+    session.commit()
 
-    return {"mensaje": "Transacción no encontrada"}
+    return {"mensaje": "Transacción eliminada correctamente"}

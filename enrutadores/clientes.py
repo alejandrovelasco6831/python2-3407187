@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
-from modelos.clientes import Cliente, ClienteCreate
+from modelos.clientes import Cliente, ClienteCreate, ClienteReadConFacturas
 from database.conexion import get_session
 
 router = APIRouter()
@@ -12,7 +12,7 @@ def listar_clientes(session: Session = Depends(get_session)):
     return session.exec(select(Cliente)).all()
 
 
-@router.get("/clientes/{id}")
+@router.get("/clientes/{id}", response_model=ClienteReadConFacturas)
 def buscar_cliente(id: int, session: Session = Depends(get_session)):
     cliente = session.get(Cliente, id)
 
