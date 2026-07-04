@@ -4,14 +4,10 @@ from sqlmodel import Session, select
 from modelos.clientes import Cliente, ClienteCreate, ClienteReadConFacturas
 from database.conexion import get_session
 
-<<<<<<< HEAD
 router = APIRouter(
     prefix="/clientes",
     tags=["Clientes"]
 )
-=======
-router = APIRouter()
->>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 
 
 @router.get("/clientes")
