@@ -1,61 +1,71 @@
-from fastapi import APIRouter
-from modelos.clientes import Cliente
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
+
+from modelos.clientes import Cliente, ClienteCreate
+from database.conexion import get_session
 
 router = APIRouter()
 
-clientes = []
 
 @router.get("/clientes")
-def listar_clientes():
-    return clientes
+def listar_clientes(session: Session = Depends(get_session)):
+    return session.exec(select(Cliente)).all()
 
 
 @router.get("/clientes/{id}")
-def listar_cliente(id: int):
+def buscar_cliente(id: int, session: Session = Depends(get_session)):
+    cliente = session.get(Cliente, id)
 
-    for cliente in clientes:
-        if cliente.id == id:
-            return cliente
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
-    return {"mensaje": "Cliente no encontrado"}
+    return cliente
 
 
 @router.post("/clientes")
-def crear_cliente(cliente: Cliente):
+def crear_cliente(
+    cliente: ClienteCreate,
+    session: Session = Depends(get_session)
+):
+    nuevo_cliente = Cliente.model_validate(cliente)
 
-    clientes.append(cliente)
+    session.add(nuevo_cliente)
+    session.commit()
+    session.refresh(nuevo_cliente)
 
-    return {
-        "mensaje": "Cliente agregado",
-        "datos": cliente
-    }
+    return nuevo_cliente
 
 
 @router.put("/clientes/{id}")
-def actualizar_cliente(id: int, cliente: Cliente):
+def actualizar_cliente(
+    id: int,
+    datos: ClienteCreate,
+    session: Session = Depends(get_session)
+):
+    cliente = session.get(Cliente, id)
 
-    for i in range(len(clientes)):
-        if clientes[i].id == id:
-            clientes[i] = cliente
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
-            return {
-                "mensaje": "Cliente actualizado",
-                "datos": cliente
-            }
+    cliente.nombre = datos.nombre
+    cliente.correo = datos.correo
+    cliente.telefono = datos.telefono
 
-    return {"mensaje": "Cliente no encontrado"}
+    session.add(cliente)
+    session.commit()
+    session.refresh(cliente)
+
+    return cliente
 
 
 @router.delete("/clientes/{id}")
-def eliminar_cliente(id: int):
+def eliminar_cliente(id: int, session: Session = Depends(get_session)):
+    cliente = session.get(Cliente, id)
 
-    for i in range(len(clientes)):
-        if clientes[i].id == id:
-            eliminado = clientes.pop(i)
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
 
-            return {
-                "mensaje": "Cliente eliminado",
-                "datos": eliminado
-            }
+    session.delete(cliente)
+    session.commit()
 
-    return {"mensaje": "Cliente no encontrado"}
+    return {"mensaje": "Cliente eliminado correctamente"}
