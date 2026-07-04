@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from modelos.transacciones import Transaccion, TransaccionCreate
+<<<<<<< HEAD
 from modelos.facturas import Factura
 from modelos.clientes import Cliente
 from database.conexion import get_session
@@ -37,6 +38,19 @@ def listar_transacciones(session: Session = Depends(get_session)):
 
 
 @router.post("/")
+=======
+from database.conexion import get_session
+
+router = APIRouter()
+
+
+@router.get("/transacciones")
+def listar_transacciones(session: Session = Depends(get_session)):
+    return session.exec(select(Transaccion)).all()
+
+
+@router.post("/transacciones")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def crear_transaccion(
     transaccion: TransaccionCreate,
     session: Session = Depends(get_session)
@@ -50,13 +64,18 @@ def crear_transaccion(
     return nueva_transaccion
 
 
+<<<<<<< HEAD
 @router.get("/{id}")
+=======
+@router.get("/transacciones/{id}")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def buscar_transaccion(id: int, session: Session = Depends(get_session)):
     transaccion = session.get(Transaccion, id)
 
     if not transaccion:
         raise HTTPException(status_code=404, detail="Transacción no encontrada")
 
+<<<<<<< HEAD
     factura = session.get(Factura, transaccion.factura_id)
 
     cliente = None
@@ -73,6 +92,12 @@ def buscar_transaccion(id: int, session: Session = Depends(get_session)):
 
 
 @router.put("/{id}")
+=======
+    return transaccion
+
+
+@router.put("/transacciones/{id}")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def actualizar_transaccion(
     id: int,
     datos: TransaccionCreate,
@@ -94,7 +119,11 @@ def actualizar_transaccion(
     return transaccion
 
 
+<<<<<<< HEAD
 @router.delete("/{id}")
+=======
+@router.delete("/transacciones/{id}")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def eliminar_transaccion(id: int, session: Session = Depends(get_session)):
     transaccion = session.get(Transaccion, id)
 

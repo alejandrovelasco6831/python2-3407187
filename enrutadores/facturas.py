@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from modelos.facturas import Factura, FacturaCreate
+<<<<<<< HEAD
 from modelos.clientes import Cliente
 from database.conexion import get_session
 
@@ -31,6 +32,19 @@ def listar_facturas(session: Session = Depends(get_session)):
 
 
 @router.post("/")
+=======
+from database.conexion import get_session
+
+router = APIRouter()
+
+
+@router.get("/facturas")
+def listar_facturas(session: Session = Depends(get_session)):
+    return session.exec(select(Factura)).all()
+
+
+@router.post("/facturas")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def crear_factura(
     factura: FacturaCreate,
     session: Session = Depends(get_session)
@@ -44,13 +58,18 @@ def crear_factura(
     return nueva_factura
 
 
+<<<<<<< HEAD
 @router.get("/{id}")
+=======
+@router.get("/facturas/{id}")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def buscar_factura(id: int, session: Session = Depends(get_session)):
     factura = session.get(Factura, id)
 
     if not factura:
         raise HTTPException(status_code=404, detail="Factura no encontrada")
 
+<<<<<<< HEAD
     cliente = session.get(Cliente, factura.cliente_id)
 
     return {
@@ -62,6 +81,12 @@ def buscar_factura(id: int, session: Session = Depends(get_session)):
 
 
 @router.put("/{id}")
+=======
+    return factura
+
+
+@router.put("/facturas/{id}")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def actualizar_factura(
     id: int,
     datos: FacturaCreate,
@@ -83,7 +108,11 @@ def actualizar_factura(
     return factura
 
 
+<<<<<<< HEAD
 @router.delete("/{id}")
+=======
+@router.delete("/facturas/{id}")
+>>>>>>> 586134f5fc7db877d11fdf004ad14c0c3ebeb55c
 def eliminar_factura(id: int, session: Session = Depends(get_session)):
     factura = session.get(Factura, id)
 
