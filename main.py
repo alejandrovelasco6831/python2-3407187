@@ -1,22 +1,27 @@
 from fastapi import FastAPI
 from modelos.clientes import Cliente
+from modelos.facturas import Factura
+from modelos.transacciones import Transaccion
 
 app = FastAPI()
 
-# Lista temporal de clientes
 clientes = []
+facturas = []
+transacciones = []
 
-# Ruta principal
 @app.get("/")
 def inicio():
     return {"mensaje": "API funcionando"}
 
-# Listar todos los clientes
+# ==========================
+# CLIENTES
+# ==========================
+
 @app.get("/clientes")
 def listar_clientes():
     return clientes
 
-# Listar un cliente por ID
+
 @app.get("/clientes/{id}")
 def listar_cliente(id: int):
 
@@ -26,17 +31,65 @@ def listar_cliente(id: int):
 
     return {"mensaje": "Cliente no encontrado"}
 
-# Editar un cliente
+
+@app.post("/clientes")
+def crear_cliente(cliente: Cliente):
+    return {"mensaje": "Endpoint crear cliente"}
+
+
 @app.put("/clientes/{id}")
 def actualizar_cliente(id: int, cliente: Cliente):
+    return {"mensaje": "Endpoint actualizar cliente"}
 
-    for i in range(len(clientes)):
-        if clientes[i].id == id:
-            clientes[i] = cliente
 
-            return {
-                "mensaje": "Cliente actualizado",
-                "datos": cliente
-            }
+@app.delete("/clientes/{id}")
+def eliminar_cliente(id: int):
+    return {"mensaje": "Endpoint eliminar cliente"}
 
-    return {"mensaje": "Cliente no encontrado"}
+
+# ==========================
+# FACTURAS
+# ==========================
+
+@app.get("/facturas")
+def listar_facturas():
+    return facturas
+
+
+@app.post("/facturas")
+def crear_factura(factura: Factura):
+    return {"mensaje": "Endpoint crear factura"}
+
+
+@app.put("/facturas/{id}")
+def actualizar_factura(id: int, factura: Factura):
+    return {"mensaje": "Endpoint actualizar factura"}
+
+
+@app.delete("/facturas/{id}")
+def eliminar_factura(id: int):
+    return {"mensaje": "Endpoint eliminar factura"}
+
+
+# ==========================
+# TRANSACCIONES
+# ==========================
+
+@app.get("/transacciones")
+def listar_transacciones():
+    return transacciones
+
+
+@app.post("/transacciones")
+def crear_transaccion(transaccion: Transaccion):
+    return {"mensaje": "Endpoint crear transaccion"}
+
+
+@app.put("/transacciones/{id}")
+def actualizar_transaccion(id: int, transaccion: Transaccion):
+    return {"mensaje": "Endpoint actualizar transaccion"}
+
+
+@app.delete("/transacciones/{id}")
+def eliminar_transaccion(id: int):
+    return {"mensaje": "Endpoint eliminar transaccion"}
