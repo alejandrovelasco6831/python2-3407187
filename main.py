@@ -58,17 +58,43 @@ def listar_facturas():
 
 @app.post("/facturas")
 def crear_factura(factura: Factura):
-    return {"mensaje": "Endpoint crear factura"}
+
+    facturas.append(factura)
+
+    return {
+        "mensaje": "Factura agregada",
+        "datos": factura
+    }
 
 
 @app.put("/facturas/{id}")
 def actualizar_factura(id: int, factura: Factura):
-    return {"mensaje": "Endpoint actualizar factura"}
+
+    for i in range(len(facturas)):
+        if facturas[i].id == id:
+            facturas[i] = factura
+
+            return {
+                "mensaje": "Factura actualizada",
+                "datos": factura
+            }
+
+    return {"mensaje": "Factura no encontrada"}
 
 
 @app.delete("/facturas/{id}")
 def eliminar_factura(id: int):
-    return {"mensaje": "Endpoint eliminar factura"}
+
+    for i in range(len(facturas)):
+        if facturas[i].id == id:
+            eliminada = facturas.pop(i)
+
+            return {
+                "mensaje": "Factura eliminada",
+                "datos": eliminada
+            }
+
+    return {"mensaje": "Factura no encontrada"}
 
 
 # ==========================
