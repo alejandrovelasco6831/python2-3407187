@@ -5,9 +5,14 @@ from modelos.transacciones import Transaccion
 
 app = FastAPI()
 
+# Listas temporales
 clientes = []
 facturas = []
 transacciones = []
+
+# ==========================
+# RUTA PRINCIPAL
+# ==========================
 
 @app.get("/")
 def inicio():
@@ -34,17 +39,43 @@ def listar_cliente(id: int):
 
 @app.post("/clientes")
 def crear_cliente(cliente: Cliente):
-    return {"mensaje": "Endpoint crear cliente"}
+
+    clientes.append(cliente)
+
+    return {
+        "mensaje": "Cliente agregado",
+        "datos": cliente
+    }
 
 
 @app.put("/clientes/{id}")
 def actualizar_cliente(id: int, cliente: Cliente):
-    return {"mensaje": "Endpoint actualizar cliente"}
+
+    for i in range(len(clientes)):
+        if clientes[i].id == id:
+            clientes[i] = cliente
+
+            return {
+                "mensaje": "Cliente actualizado",
+                "datos": cliente
+            }
+
+    return {"mensaje": "Cliente no encontrado"}
 
 
 @app.delete("/clientes/{id}")
 def eliminar_cliente(id: int):
-    return {"mensaje": "Endpoint eliminar cliente"}
+
+    for i in range(len(clientes)):
+        if clientes[i].id == id:
+            eliminado = clientes.pop(i)
+
+            return {
+                "mensaje": "Cliente eliminado",
+                "datos": eliminado
+            }
+
+    return {"mensaje": "Cliente no encontrado"}
 
 
 # ==========================
@@ -145,4 +176,3 @@ def eliminar_transaccion(id: int):
             }
 
     return {"mensaje": "Transacción no encontrada"}
-
